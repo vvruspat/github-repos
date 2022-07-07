@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApolloError } from '@apollo/client/core';
 import { TRelayPageInfo } from '@apollo/client/utilities/policies/pagination';
 import { Apollo, gql, QueryRef } from 'apollo-angular';
@@ -12,9 +12,9 @@ type Response = {
   };
 };
 
-const reposQuery = gql<Response, { query: string }>`
-  query ListOfRepositories($query: String!) {
-    search(query: $query, type: REPOSITORY, first: 10) {
+const reposQuery = gql<Response, { query: string; after?: string }>`
+  query ListOfRepositories($query: String!, $after: String) {
+    search(query: $query, after: $after, type: REPOSITORY, first: 10) {
       nodes {
         ... on Repository {
           id
@@ -32,6 +32,7 @@ const reposQuery = gql<Response, { query: string }>`
       }
       pageInfo {
         hasNextPage
+        endCursor
       }
       repositoryCount
     }
@@ -44,11 +45,13 @@ const reposQuery = gql<Response, { query: string }>`
   styleUrls: ['./repos-list.component.css'],
 })
 export class ReposListComponent implements OnInit {
-  repos: any[] = [];
+  repos: Repository[] = [];
   loading = false;
   error: ApolloError | undefined;
   query: string = 'react';
-  querySubscription?: QueryRef<Response, { query: string }>;
+  hasNextPage: boolean = true;
+  endCursor?: string;
+  querySubscription?: QueryRef<Response, { query: string; after?: string }>;
 
   constructor(private apollo: Apollo) {}
 
@@ -60,16 +63,30 @@ export class ReposListComponent implements OnInit {
       },
     });
 
-    this.querySubscription.valueChanges.subscribe((result: any) => {
-      this.repos = result?.data?.search?.nodes ?? [];
+    this.querySubscription.valueChanges.subscribe((result) => {
+      this.repos = this.repos.concat(result?.data?.search?.nodes ?? []);
 
-      this.loading = result.loading;
+      this.loading = false;
       this.error = result.error;
+      this.endCursor = result.data.search.pageInfo.endCursor;
+      this.hasNextPage = result.data.search.pageInfo.hasNextPage;
     });
   }
 
   onFilterChanged(value: string) {
+    this.loading = true;
+    this.repos = [];
     this.query = value;
     this.querySubscription?.refetch({ query: value });
+  }
+
+  onIntersection(evt: IntersectionObserverEntry) {
+    if (this.hasNextPage && evt.isIntersecting) {
+      this.querySubscription?.refetch({
+        query: this.query,
+        after: this.endCursor,
+      });
+      this.loading = true;
+    }
   }
 }

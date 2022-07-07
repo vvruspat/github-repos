@@ -1,10 +1,27 @@
-<div *ngIf="loading">Loading...</div>
 <div *ngIf="error">Error :(</div>
 <div class="filter">
-  <repos-filter (onChange)="onFilterChanged($event)"></repos-filter>
+  <repos-filter
+    (onChange)="onFilterChanged($event)"
+    [defaultValue]="query"
+  ></repos-filter>
 </div>
-<div *ngIf="repos" class="repos">
+<div
+  *ngIf="repos"
+  class="repos"
+  waIntersectionObserver
+  waIntersectionThreshold="0.5"
+>
   <div *ngFor="let repo of repos">
     <repo [repo]="repo"></repo>
   </div>
+
+  <div (waIntersectionObservee)="onIntersection($event[0])"></div>
+</div>
+
+<div *ngIf="!repos.length && !loading" class="empty">
+  Nothing has been found
+</div>
+
+<div *ngIf="loading" class="spinner">
+  <mat-spinner diameter="36"></mat-spinner>
 </div>
