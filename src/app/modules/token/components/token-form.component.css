@@ -1,0 +1,14 @@
+.token-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.token-form {
+  width: 100%;
+}
+
+.token-field {
+  width: 100%;
+}

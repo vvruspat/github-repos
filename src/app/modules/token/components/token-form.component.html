@@ -1,0 +1,31 @@
+<mat-card class="token-page">
+  <mat-card-title>Login</mat-card-title>
+  <mat-card-subtitle>Enter GitHub token to Login</mat-card-subtitle>
+  <mat-card-content>
+    <form class="token-form">
+      <mat-form-field class="token-field" appearance="fill">
+        <mat-label>Token</mat-label>
+        <input type="text" matInput [formControl]="tokenFormControl" />
+        <mat-hint>Github token</mat-hint>
+        <mat-error *ngIf="tokenFormControl.hasError('required')">
+          Token is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="tokenFormControl.hasError('minlength')">
+          Token length minimum is 40 characters
+        </mat-error>
+        <mat-error *ngIf="tokenFormControl.hasError('maxlength')">
+          Token length maximum is 40 characters
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button
+      mat-button
+      (click)="onLoginClick()"
+      [disabled]="!tokenFormControl.valid"
+    >
+      Login
+    </button>
+  </mat-card-actions>
+</mat-card>

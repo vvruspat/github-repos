@@ -1,0 +1,14 @@
+.stars {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.stars-icon {
+  color: #bda032;
+}
+
+.stars-number {
+  margin-left: 0.5rem;
+}

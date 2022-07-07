@@ -1,0 +1,10 @@
+<div *ngIf="loading">Loading...</div>
+<div *ngIf="error">Error :(</div>
+<div class="filter">
+  <repos-filter (onChange)="onFilterChanged($event)"></repos-filter>
+</div>
+<div *ngIf="repos" class="repos">
+  <div *ngFor="let repo of repos">
+    <repo [repo]="repo"></repo>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="filter">
+  <form class="token-form">
+    <mat-form-field class="token-field" appearance="fill">
+      <mat-label>Repository name filter</mat-label>
+      <input
+        type="text"
+        matInput
+        (change)="onFilterChange($event)"
+        [value]="value || ''"
+      />
+      <mat-hint>Github repository name</mat-hint>
+    </mat-form-field>
+  </form>
+</div>

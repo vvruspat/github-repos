@@ -1,0 +1,16 @@
+<mat-card class="repo-card">
+  <mat-card-title class="repo-name"
+    ><mat-icon *ngIf="repo.isPrivate">enhanced_encryption</mat-icon
+    >{{ repo.name }}</mat-card-title
+  >
+  <mat-card-subtitle
+    ><repo-owner [owner]="repo.owner"></repo-owner
+  ></mat-card-subtitle>
+  <mat-card-content>
+    {{ repo.description }}
+  </mat-card-content>
+  <mat-card-footer align="end" class="repo-footer">
+    <repo-stars [stars]="repo.stargazerCount"></repo-stars>
+    <a mat-button [href]="this.repo.url" target="_blank">View</a>
+  </mat-card-footer>
+</mat-card>
