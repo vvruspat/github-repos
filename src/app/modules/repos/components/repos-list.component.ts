@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ApolloError } from '@apollo/client/core';
 import { TRelayPageInfo } from '@apollo/client/utilities/policies/pagination';
 import { Apollo, gql, QueryRef } from 'apollo-angular';
@@ -53,7 +54,7 @@ export class ReposListComponent implements OnInit {
   endCursor?: string;
   querySubscription?: QueryRef<Response, { query: string; after?: string }>;
 
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo, private router: Router) {}
 
   ngOnInit() {
     this.querySubscription = this.apollo.watchQuery({
@@ -61,16 +62,36 @@ export class ReposListComponent implements OnInit {
       variables: {
         query: this.query,
       },
+      errorPolicy: 'all',
     });
 
-    this.querySubscription.valueChanges.subscribe((result) => {
-      this.repos = this.repos.concat(result?.data?.search?.nodes ?? []);
+    // Я знаю, что этот метод depricated, но по какой-то причине, ошибка до observer не долетает. Разобраться пока не вышло.
+    this.querySubscription.valueChanges.subscribe(
+      (result) => {
+        this.repos = this.repos.concat(result?.data?.search?.nodes ?? []);
 
-      this.loading = false;
-      this.error = result.error;
-      this.endCursor = result.data.search.pageInfo.endCursor;
-      this.hasNextPage = result.data.search.pageInfo.hasNextPage;
-    });
+        this.endCursor = result.data.search.pageInfo.endCursor;
+        this.hasNextPage = result.data.search.pageInfo.hasNextPage;
+      },
+      (error) => {
+        this.error = error;
+        // Примитивное поведение, но пока достаточно
+        localStorage.setItem('token', '');
+        this.router.navigateByUrl('token');
+      },
+      () => {
+        this.loading = false;
+      }
+    );
+
+    // this.querySubscription.valueChanges.subscribe(observer => {
+    //   this.repos = this.repos.concat(observer?.data?.search?.nodes ?? []);
+
+    //   this.error = observer.error;
+    //   this.endCursor = observer.data.search.pageInfo.endCursor;
+    //   this.hasNextPage = observer.data.search.pageInfo.hasNextPage;
+    //   this.loading = false;
+    // });
   }
 
   onFilterChanged(value: string) {

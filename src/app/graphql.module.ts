@@ -7,9 +7,8 @@ import {
 } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
 import { HttpLink } from 'apollo-angular/http';
-import { environment } from './../environments/environment';
 
-const uri = 'https://api.github.com/graphql'; // <-- add the URL of the GraphQL server here
+const uri = 'https://api.github.com/graphql';
 
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
   const basic = setContext((operation, context) => ({
